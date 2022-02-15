@@ -70,7 +70,7 @@ def webhook():
 while True:
     try:
         print("Bot is running")
-        app.run()
-    except Exception as e:print(e)
+        app.run(host="0.0.0.0",port=5050)
+    except Exception as e:print(e);continue
     
     
