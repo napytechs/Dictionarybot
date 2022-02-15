@@ -1,13 +1,15 @@
 import json
 import urllib
+import os
 from difflib import get_close_matches
 from telebot import TeleBot,types
 DICTIONARY = urllib.request.urlopen("https://raw.githubusercontent.com/matthewreagan/WebstersEnglishDictionary/master/dictionary.json")
 file = ''
 for i in DICTIONARY:
     file+=i.decode()
+TOKEN = os.getenv("TOKEN")
 DICTIONARY = json.loads(file)   
-bot = TeleBot("5273033630:AAFykNIvLqAWQENlCO7c-NorVqBtTYhMQMw")
+bot = TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start'],chat_types=['private'])
 def start(msg):
