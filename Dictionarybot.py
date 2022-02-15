@@ -3,18 +3,20 @@ import urllib
 import os
 from difflib import get_close_matches
 from telebot import TeleBot,types
+from flask import Flask,request 
 DICTIONARY = urllib.request.urlopen("https://raw.githubusercontent.com/matthewreagan/WebstersEnglishDictionary/master/dictionary.json")
 file = ''
 for i in DICTIONARY:
     file+=i.decode()
 TOKEN = os.getenv("TOKEN")
+URL = os.getenv("URL")
 DICTIONARY = json.loads(file)   
 bot = TeleBot(TOKEN)
-
+app = Flask(__name__)
 @bot.message_handler(commands=['start'],chat_types=['private'])
 def start(msg):
-    bot.send_message(msg.chat.id,"👋 Hey there {name} i am dictionary bot. I have more thank 100k words\n"
-                                 "✨ send me any english word, i will send you the explanation then.\n"
+    bot.send_message(msg.chat.id,"👋 Hey there {name} i am dictionary bot. I have more than 100k words\n"
+                                 "✨ send me any english word, i will send you the definition then.\n"
                                  "🌷 I wish good time to here :)".format(name=msg.from_user.first_name))
 @bot.message_handler(chat_types=['private'])
 def on_message(msg):
@@ -48,10 +50,27 @@ def on_callback(call):
         bot.send_message(call.message.chat.id,f"<code>{DICTIONARY[call.data]}</code>",parse_mode='html')
     bot.delete_message(call.message.chat.id,call.message.message_id)
 
+@app.route('/' + TOKEN, methods=['POST'])
+def getMessage():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "!", 200
+
+
+@app.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=URL + TOKEN)
+    print("Webhook Connected.....")
+    return "!", 200
+
+
+
 while True:
     try:
-        print("Bot is running...")
-        bot.polling()
+        print("Bot is running")
+        app.run(host="localhost",port=9999)
     except:continue
     
     
