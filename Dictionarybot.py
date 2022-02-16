@@ -50,27 +50,11 @@ def on_callback(call):
         bot.send_message(call.message.chat.id,f"<code>{DICTIONARY[call.data]}</code>",parse_mode='html')
     bot.delete_message(call.message.chat.id,call.message.message_id)
 
-@app.route('/' + TOKEN, methods=['POST'])
-def getMessage():
-    json_string = request.get_data().decode('utf-8')
-    update = telebot.types.Update.de_json(json_string)
-    bot.process_new_updates([update])
-    return "!", 200
-
-
-@app.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url=URL +"/"+ TOKEN)
-    print("Webhook Connected.....")
-    return "!", 200
-
-
-
 while True:
     try:
         print("Bot is running")
-        app.run(host="0.0.0.0",port=os.getenv("PORT",5050))
-    except Exception as e:print(e);continue
+        bot.polling(non_stop=True)
+    
+    except Exception as e:continue
     
     
